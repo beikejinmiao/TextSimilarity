@@ -19,5 +19,5 @@ build/
 # PyCharm
 .idea/
 
-
+*.log
 

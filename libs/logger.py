@@ -5,7 +5,7 @@ import re
 import json
 import logging
 import logging.config
-from config import WORK_NAME, MAIN_HOME, LOGGING_CFG_FILE
+from conf.paths import WORK_NAME, MAIN_HOME, LOGGING_CFG_FILE
 LOGGING_CFG = json.load(open(LOGGING_CFG_FILE))
 filename = LOGGING_CFG["handlers"]["file"]["filename"]
 LOGGING_CFG["handlers"]["file"]["filename"] = os.path.join(MAIN_HOME, filename)

@@ -2,12 +2,12 @@
 # -*- coding:utf-8 -*-
 import os
 
-MAIN_HOME = os.path.abspath(os.path.dirname(__file__))  # 返回项目主入口文件的路径
+MAIN_HOME = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))  # 返回项目根目录
 WORK_NAME = MAIN_HOME.split(os.path.sep)[-1].lower()  # iqa
 
 RESOURCE_HOME = os.path.join(MAIN_HOME, "resources")
 MODEL_HOME = os.path.join(RESOURCE_HOME, "model")
-LOGGING_CFG_FILE = os.path.join(MAIN_HOME, "libs", "logger.json")
+LOGGING_CFG_FILE = os.path.join(MAIN_HOME, "conf", "logger.json")
 
 
 stopws_home = os.path.join(RESOURCE_HOME, "stopwords")

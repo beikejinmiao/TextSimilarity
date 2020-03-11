@@ -5,7 +5,6 @@ import jieba
 from libs.resource import stopwords, lexicon
 from libs.singleton import Singleton
 
-
 url_regex = re.compile(r'(http|https)://[a-zA-Z0-9_\.@&/#!#\?]+', re.VERBOSE | re.IGNORECASE)
 date_regex = re.compile(u"""
         \d+年[度]? |
@@ -36,7 +35,7 @@ class JieBa(object):
 
     def __init__(self, lexn="accountant", stopws="hit"):
         """
-
+        tokenize the text based on 'jieba'
         :param lexn:
         :param stopws:
         """
@@ -51,12 +50,12 @@ class JieBa(object):
         else:
             jieba.add_word(words)
 
-    def add_lexicon(self, what="all"):
-            if what == "all":
-                for x in lexicon:
-                    self.add_words(lexicon[x])
-            else:
-                self.add_words(lexicon[what])
+    def add_lexicon(self, what=None):
+        if what == "all":
+            for x in lexicon:
+                self.add_words(lexicon[x])
+        elif what in lexicon:
+            self.add_words(lexicon[what])
 
     def cut(self, text, pregex=False, stopws=True, self_stopws=True):
         """
@@ -70,7 +69,7 @@ class JieBa(object):
         text = str(text).lower()
         if pregex is True:
             text = regex_change(text)
-        words = jieba.cut(text)
+        words = jieba.lcut(text)    # 精确模式,返回list
         if stopws is True:
             words = [word for word in words if len(word.strip()) > 0 and word not in self.stop_words]
         if self_stopws is True:
@@ -79,4 +78,3 @@ class JieBa(object):
 
 
 tokenizer = JieBa(lexn="all", stopws="hit")
-

@@ -17,7 +17,6 @@ class TF_IDF(object):
         self.model = models.TfidfModel(corpus)
         self.index = similarities.SparseMatrixSimilarity(self.model[corpus], num_features=num_features)
         self.tokenize = tokenizer.cut if tokenize is None else tokenize
-        print(self.tokenize)
 
     def query(self, text, topn=5, field="question"):
         if self.dataframe is None:
@@ -32,4 +31,7 @@ class TF_IDF(object):
             # ix: document_number
             results.append((self.dataframe.iloc[ix][field], prob))
         return results
+
+    def dump(self):
+        pass
 

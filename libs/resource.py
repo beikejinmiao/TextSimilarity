@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-from config import stopaths, lexiconpaths
+from conf.paths import stopaths, lexiconpaths
 from libs.util import reader
 from libs.singleton import Singleton
 
