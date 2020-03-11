@@ -1,0 +1,39 @@
+{
+  "version":1,
+
+  "handlers":{
+    "console":{
+      "class":"logging.StreamHandler",
+      "level":"DEBUG",
+      "formatter":"standard"
+    },
+    "file":{
+      "class":"logging.handlers.WatchedFileHandler",
+      "level":"DEBUG",
+      "formatter":"standard",
+      "filename":"iqa.log"
+    }
+  },
+
+  "formatters":{
+    "short": {
+      "format": "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+    },
+    "standard":{
+      "format": "%(asctime)s - %(levelname)s - %(name)s - %(filename)s:%(lineno)s - %(message)s"
+    }
+  },
+
+  "loggers":{
+    "iqa":{
+      "level":"ERROR",
+      "handlers":["file"],
+      "propagate": 0
+    },
+
+    "root":{
+      "level":"DEBUG",
+      "handlers":["console"]
+    }
+  }
+}
