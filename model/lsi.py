@@ -17,7 +17,7 @@ class LSI(object):
         self.index = similarities.MatrixSimilarity(self.model[corpus])
         self.tokenize = tokenizer.cut if tokenize is None else tokenize
 
-    def query(self, text, topn=5, field="question"):
+    def nearest(self, text, topn=5, field="question"):
         if self.dataframe is None:
             logger.error("please load the csv data firstly.")
             return
@@ -31,6 +31,4 @@ class LSI(object):
             results.append((self.dataframe.iloc[ix][field], prob))
         return results
 
-    def dump(self):
-        pass
 

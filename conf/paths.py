@@ -29,4 +29,5 @@ lexiconpaths = {
 }
 
 
-
+corpus_path = os.path.join(MODEL_HOME, 'corpus.mm')
+dictionary_path = os.path.join(MODEL_HOME, 'dictionary.pkl')

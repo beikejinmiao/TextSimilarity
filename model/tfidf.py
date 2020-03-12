@@ -18,7 +18,7 @@ class TF_IDF(object):
         self.index = similarities.SparseMatrixSimilarity(self.model[corpus], num_features=num_features)
         self.tokenize = tokenizer.cut if tokenize is None else tokenize
 
-    def query(self, text, topn=5, field="question"):
+    def nearest(self, text, topn=5, field="question"):
         if self.dataframe is None:
             logger.error("please load the csv data firstly.")
             return
@@ -32,6 +32,4 @@ class TF_IDF(object):
             results.append((self.dataframe.iloc[ix][field], prob))
         return results
 
-    def dump(self):
-        pass
 

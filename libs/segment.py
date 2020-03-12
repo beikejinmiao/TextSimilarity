@@ -33,7 +33,7 @@ def regex_change(text):
 class JieBa(object):
     __metaclass__ = Singleton
 
-    def __init__(self, lexn="accountant", stopws="hit"):
+    def __init__(self, stopws="hit", lexn=None):
         """
         tokenize the text based on 'jieba'
         :param lexn:
@@ -41,7 +41,7 @@ class JieBa(object):
         """
         self.stop_words = stopwords[stopws]
         self.self_stop_words = stopwords["self"]
-        self.add_lexicon(what=lexn)
+        self.add_lexicon(lexn=lexn)
 
     def add_words(self, words):
         if isinstance(words, (list, tuple, set)):
@@ -50,12 +50,12 @@ class JieBa(object):
         else:
             jieba.add_word(words)
 
-    def add_lexicon(self, what=None):
-        if what == "all":
+    def add_lexicon(self, lexn=None):
+        if lexn == "all":
             for x in lexicon:
                 self.add_words(lexicon[x])
-        elif what in lexicon:
-            self.add_words(lexicon[what])
+        elif lexn in lexicon:
+            self.add_words(lexicon[lexn])
 
     def cut(self, text, pregex=False, stopws=True, self_stopws=True):
         """
@@ -77,4 +77,4 @@ class JieBa(object):
         return words
 
 
-tokenizer = JieBa(lexn="all", stopws="hit")
+tokenizer = JieBa(stopws="hit", lexn="all")
