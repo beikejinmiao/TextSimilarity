@@ -28,7 +28,7 @@ class IQAMode(object):
         if not os.path.exists(MODEL_HOME):
             os.makedirs(MODEL_HOME)
         # load original data
-        # df = pd.read_csv(df_tokens_path,header=None, names=["id", "question", "answer"])
+        # df = pd.read_csv(original_csv,header=None, names=["id", "question", "answer"])
         df = pd.read_csv(original_csv)
         logger.debug("load dataframe: '%s', size: %d" % (original_csv, df.shape[0]))
         df = df[["id", "question"]].drop_duplicates().reset_index(drop=True)
