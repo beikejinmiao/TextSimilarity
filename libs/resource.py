@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+import os
 from conf.paths import stopaths, lexiconpaths
 from libs.util import reader
 from libs.singleton import Singleton
+from libs.logger import get_logger
+
+logger = get_logger(_file_=__file__)
 
 
 class AttrDict(object):
@@ -41,6 +45,8 @@ class Lexicon(AttrDict):
         self.accountant = reader(lexiconpaths["accountant"])
         self.finance = reader(lexiconpaths["finance"])
         self.self = reader(lexiconpaths["self"])
+        logger.debug("load lexicon '%s' successfully" %
+                     ",".join([os.path.basename(path) for path in lexiconpaths.values()]))
 
 
 class StopWords(AttrDict):
@@ -54,9 +60,11 @@ class StopWords(AttrDict):
         self.scu = reader(stopaths["scu"])
         self.july = reader(stopaths["july"])
         self.self = reader(stopaths["self"])
+        logger.debug("load stop_words '%s' successfully" %
+                     ",".join([os.path.basename(path) for path in stopaths.values()]))
 
 
-#
-lexicon = Lexicon()
-stopwords = StopWords()
+# init stop_words and lexicon when needed rather than import python
+# lexicon = Lexicon()
+# stopwords = StopWords()
 

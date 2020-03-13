@@ -2,7 +2,8 @@
 # -*- coding:utf-8 -*-
 import re
 import jieba
-from libs.resource import stopwords, lexicon
+# from libs.resource import stopwords, lexicon
+from libs.resource import StopWords, Lexicon
 from libs.singleton import Singleton
 
 url_regex = re.compile(r'(http|https)://[a-zA-Z0-9_\.@&/#!#\?]+', re.VERBOSE | re.IGNORECASE)
@@ -33,15 +34,17 @@ def regex_change(text):
 class JieBa(object):
     __metaclass__ = Singleton
 
-    def __init__(self, stopws="hit", lexn=None):
+    def __init__(self, stopws_type="hit", lexn_type=None):
         """
         tokenize the text based on 'jieba'
-        :param lexn:
         :param stopws:
+        :param lexn_type:
         """
-        self.stop_words = stopwords[stopws]
-        self.self_stop_words = stopwords["self"]
-        self.add_lexicon(lexn=lexn)
+        self.stopws_type = stopws_type
+        self.lexn_type = lexn_type
+        self.stop_words = None
+        self.lexicon = None
+        self._is_add_lexn = False          # for load the lexicon lazily
 
     def add_words(self, words):
         if isinstance(words, (list, tuple, set)):
@@ -50,12 +53,16 @@ class JieBa(object):
         else:
             jieba.add_word(words)
 
-    def add_lexicon(self, lexn=None):
-        if lexn == "all":
-            for x in lexicon:
-                self.add_words(lexicon[x])
-        elif lexn in lexicon:
-            self.add_words(lexicon[lexn])
+    def add_lexicon(self, lexn_type=None):
+        self._is_add_lexn = True
+        if self.lexicon is None:
+            self.lexicon = Lexicon()
+
+        if lexn_type == "all":
+            for x in self.lexicon:
+                self.add_words(self.lexicon[x])
+        elif lexn_type in self.lexicon:
+            self.add_words(self.lexicon[lexn_type])
 
     def cut(self, text, pregex=False, stopws=True, self_stopws=True):
         """
@@ -66,15 +73,23 @@ class JieBa(object):
         :param self_stopws: if true, filter the word that in self stop words
         :return:
         """
+        # load stop_words and lexicon when needed
+        if self.lexn_type and self._is_add_lexn is False:
+            self.add_lexicon(lexn_type=self.lexn_type)
+        if (stopws is True or self_stopws is True) and self.stop_words is None:
+            self.stop_words = StopWords()
+        #
         text = str(text).lower()
         if pregex is True:
             text = regex_change(text)
         words = jieba.lcut(text)    # 精确模式,返回list
         if stopws is True:
-            words = [word for word in words if len(word.strip()) > 0 and word not in self.stop_words]
+            words = [word for word in words if len(word.strip()) > 0 and word not in self.stop_words[self.stopws_type]]
         if self_stopws is True:
-            words = [word for word in words if word not in self.self_stop_words]
+            words = [word for word in words if word not in self.stop_words["self"]]
         return words
 
 
-tokenizer = JieBa(stopws="hit", lexn="all")
+tokenizer = JieBa(stopws_type="hit", lexn_type="all")
+
+
