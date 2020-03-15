@@ -31,3 +31,5 @@ lexiconpaths = {
 
 corpus_path = os.path.join(MODEL_HOME, 'corpus.mm')
 dictionary_path = os.path.join(MODEL_HOME, 'dictionary.pkl')
+df_tokens_path = os.path.join(RESOURCE_HOME, "df_que_tokens.csv")
+

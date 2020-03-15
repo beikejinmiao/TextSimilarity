@@ -4,17 +4,20 @@ import os
 import gensim
 import pickle
 import pandas as pd
-from conf.paths import RESOURCE_HOME, MODEL_HOME
-from conf.paths import corpus_path, dictionary_path
+from conf.paths import MODEL_HOME, RESOURCE_HOME
+from conf.paths import corpus_path, dictionary_path, df_tokens_path
+from conf.config import all_models
 from libs.segment import tokenizer
 from model.tfidf import TF_IDF
 from model.lsi import LSI
+from model.word2vec import Word2Vector
+from model.doc2vec import Doc2Vector
 from libs.wrapper import costime
 from libs.logger import get_logger
 
 logger = get_logger(_file_=__file__)
 original_csv = os.path.join(RESOURCE_HOME, "question_1k.csv")    # accountant_qa_dataset.csv
-df_tokens_path = os.path.join(RESOURCE_HOME, "df_que_tokens.csv")
+# original_csv = "E:\\AILearn\\julyedu\\10th.TrainingCamp\\NLP\\ChatBot\\accountant_qa_dataset.csv"
 
 
 class IQAMode(object):
@@ -28,7 +31,7 @@ class IQAMode(object):
         if not os.path.exists(MODEL_HOME):
             os.makedirs(MODEL_HOME)
         # load original data
-        # df = pd.read_csv(original_csv,header=None, names=["id", "question", "answer"])
+        # df = pd.read_csv(original_csv, header=None, names=["id", "question", "answer"])
         df = pd.read_csv(original_csv)
         logger.debug("load dataframe: '%s', size: %d" % (original_csv, df.shape[0]))
         df = df[["id", "question"]].drop_duplicates().reset_index(drop=True)
@@ -40,26 +43,16 @@ class IQAMode(object):
         corpus = [dictionary.doc2bow(tokens) for tokens in df["tokens"]]
         logger.debug("build dictionary and corpus. dictionary size: %d" % (len(dictionary.token2id)))
 
-        # build model
-        logger.debug("build tfidf model")
-        self.models["tfidf"] = TF_IDF(dictionary, corpus, dataframe=df, tokenize=self.tokenize)
-        logger.debug("build lsi model")
-        self.models["lsi"] = LSI(dictionary, corpus, dataframe=df, tokenize=self.tokenize)
+        # build models
+        self.models = build_models(dictionary, corpus, df)
         if self.mode == "train":
-            self.check_model("tfidf", "lsi")
-
-        # dump df/dictionary/corpus
-        logger.debug("dump dataframe to '%s'" % df_tokens_path)
-        df["tokens"] = df["tokens"].map(lambda x: " ".join(x))
-        df.to_csv(df_tokens_path)
-        logger.debug("dump dictionary to '%s'" % dictionary_path)
-        pickle.dump(dictionary, open(dictionary_path, "wb"))
-        logger.debug("dump corpus to '%s'" % corpus_path)
-        gensim.corpora.MmCorpus.serialize(corpus_path, corpus)
+            self.check_model(*all_models)
+        # dump df/dictionary/corpus/models
+        dump(dictionary=dictionary, corpus=corpus, dataframe=df, models=self.models)
         #
         return df, dictionary, corpus
 
-    @costime
+    @costime("test mode", msg="running total")
     def test(self):
         if not os.path.exists(MODEL_HOME) or len(os.listdir(MODEL_HOME)) <= 0:
             df, dictionary, corpus = self.train()
@@ -70,27 +63,70 @@ class IQAMode(object):
             df["tokens"] = df["tokens"].map(lambda x: str(x).split())
             # load dictionary/corpus
             logger.debug("load dictionary: '%s'" % dictionary_path)
-            dictionary = pickle.load(open(dictionary_path, "rb"))
+            with open(dictionary_path, "rb") as fopen:
+                dictionary = pickle.load(fopen)
             logger.debug("load corpus: '%s'" % corpus_path)
             corpus = gensim.corpora.MmCorpus(corpus_path)
         # build model if it not existed
-        if self.models.get("tfidf") is None:
-            logger.debug("build tfidf model")
-            self.models["tfidf"] = TF_IDF(dictionary, corpus, dataframe=df, tokenize=self.tokenize)
-        if self.models.get("lsi") is None:
-            logger.debug("build lsi model")
-            self.models["lsi"] = LSI(dictionary, corpus, dataframe=df, tokenize=self.tokenize)
-        self.check_model("tfidf", "lsi")
+        if len(self.models) == 0:
+            self.models = build_models(dictionary, corpus, df, model="all", load=True)
+        self.check_model(*all_models)
 
     def server(self):
         pass
 
     def check_model(self, *args):
         question = "KTV开发票明细能不能开服务费？"
+        que_tokens = tokenizer.cut(question)
         logger.debug(question)
+        logger.debug(" ".join(que_tokens))
         for name in args:
             model = self.models.get(name)
             logger.debug("%s %s %s" % ("="*20, name.upper(), "="*20))
-            logger.debug(model.nearest(question) if model is not None else "None")
+            logger.debug(model.nearest(que_tokens) if model is not None else "None")
+
+
+def _check_model_name(*args):
+    _model = set()
+    for name in args:
+        if name == "all":
+            return all_models
+        if name not in all_models:
+            logger.info("'%s' model not existed" % name)
+        else:
+            _model.add(name)
+    return list(_model)
+
+
+def build_models(dictionary, corpus, dataframe, model="all", load=False):
+    models = dict()
+    model_names = _check_model_name(model)
+    for name in model_names:
+        if name == "tfidf":
+            models[name] = TF_IDF(dictionary, corpus, dataframe=dataframe, load=load)
+        if name == "lsi":
+            models[name] = LSI(dictionary, corpus, dataframe=dataframe, load=load)
+        if name == "word2vec":
+            models[name] = Word2Vector(dataframe=dataframe, load=load)
+        if name == "doc2vec":
+            models[name] = Doc2Vector(dataframe=dataframe, load=load)
+    return models
+
+
+def dump(dictionary=None, corpus=None, dataframe=None, models=None):
+    if dictionary is not None:
+        logger.debug("dump dictionary to '%s'" % dictionary_path)
+        with open(dictionary_path, "wb") as fopen:
+            pickle.dump(dictionary, fopen)
+    if corpus is not None:
+        logger.debug("dump corpus to '%s'" % corpus_path)
+        gensim.corpora.MmCorpus.serialize(corpus_path, corpus)
+    if dataframe is not None:
+        logger.debug("write dataframe to '%s'" % df_tokens_path)
+        dataframe["tokens"] = dataframe["tokens"].map(lambda x: " ".join(x))
+        dataframe.to_csv(df_tokens_path)
+    if models is not None:
+        for name in models:
+            models[name].dump()
 
 
