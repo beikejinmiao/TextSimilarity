@@ -33,28 +33,33 @@ class Word2Vector(SimBaseModel):
                 doc_vec = np.add(doc_vec, self.model.wv[word])
         if n_words > 0:
             doc_vec = np.divide(doc_vec, n_words)
-        return doc_vec.tolist()
+        return doc_vec
 
     def _kd_tree(self):
         X = list()
         for tokens in self.dataframe["tokens"]:
-            X.append(self.avg_doc_vector(tokens))
+            X.append(self.avg_doc_vector(tokens).tolist())
         return KDTree(np.array(X), leaf_size=50)
 
     @costime("word2vec", msg="model query nearest")
-    def nearest(self, text, topn=5, field="question"):
+    def nearest(self, text, topn=5, score=False):
         if self.dataframe is None or self.model is None or self.kdtree is None:
             logger.error("please load the csv data and train model firstly.")
             return False
 
         results = list()
-        dists, indices = self.kdtree.query(np.array(self.avg_doc_vector(self._tokens(text))).reshape(1, -1), k=topn)
+        doc_vec = self.avg_doc_vector(self._to_tokens(text))
+        dists, indices = self.kdtree.query(doc_vec.reshape(1, -1), k=topn)
         dist_sum = np.sum(dists)
         for i, dist in enumerate(dists[0]):
             # ix: document_number
             ix = indices[0][i]
             row = self.dataframe.iloc[ix]
-            results.append(self._json_rlt(row[field], 1-dist/dist_sum, tokens=row["tokens"]))
+            rlt = self._query_rlt(row, 1 - dist / dist_sum)
+            if score is True:
+                que, tok = row["question"], row["tokens"]
+                rlt["score"] = self._score(text, que, doc_vec, self.avg_doc_vector(tok))
+            results.append(rlt)
         return results
 
     def build(self, load=False):

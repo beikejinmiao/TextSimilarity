@@ -22,17 +22,21 @@ class Doc2Vector(SimBaseModel):
         self.build(load=load)
 
     @costime("doc2vec", msg="model query nearest")
-    def nearest(self, text, topn=5, field="question"):
+    def nearest(self, text, topn=5, score=False):
         if not self._ready_df_model():
             return None
 
         results = list()
-        inferred_vector = self.model.infer_vector(self._tokens(text))
+        inferred_vector = self.model.infer_vector(self._to_tokens(text))
         sorted_sims = self.model.docvecs.most_similar([inferred_vector], topn=topn)
         for ix, prob in sorted_sims:
             # ix: document_number
             row = self.dataframe.iloc[ix]
-            results.append(self._json_rlt(row[field], prob, tokens=row["tokens"]))
+            rlt = self._query_rlt(row, prob)
+            if score is True:
+                que, tok = row["question"], row["tokens"]
+                rlt["score"] = self._score(text, que, inferred_vector, self.model.infer_vector(tok))
+            results.append(rlt)
         return results
 
     def build(self, load=False):

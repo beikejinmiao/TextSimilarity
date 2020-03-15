@@ -28,7 +28,7 @@ def near_query():
         active_model = req_json["model"]
         for name in _check_model_name(active_model):
             _startime = time.time()
-            results = models[name].nearest(que_tokens, topn=5)
+            results = models[name].nearest(que_tokens, topn=5, score=True)
             costime = (time.time() - _startime) * 1000
             resp_json[name] = {"top_sim": results, "cost_time": "%.2fms" % costime}
     return json.dumps(resp_json, ensure_ascii=False, indent=4)

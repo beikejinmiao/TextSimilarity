@@ -24,20 +24,27 @@ class LSI(SimBaseModel):
         self.build(load=load)
 
     @costime("lsi", msg="model query nearest")
-    def nearest(self, text, topn=5, field="question"):
+    def nearest(self, text, topn=5, score=False):
         if not self._ready_df_model():
             return None
 
         results = list()
-        text_bow = self.dictionary.doc2bow(self._tokens(text))
-        tmpbow = self.model[text_bow]
-        sims = self.index[tmpbow]
+        text_bow = self.dictionary.doc2bow(self._to_tokens(text))
+        doc = self.model[text_bow]
+        sims = self.index[doc]
         sorted_sims = SortedDict.to_list(dict(enumerate(sims)))
         for ix, prob in sorted_sims[0:topn]:
             # ix: document_number
             row = self.dataframe.iloc[ix]
-            results.append(self._json_rlt(row[field], prob, tokens=row["tokens"]))
+            rlt = self._query_rlt(row, prob)
+            if score is True:
+                que, tok = row["question"], row["tokens"]
+                rlt["score"] = self._score(text, que, self._vector(doc), self._vector(self.model[self.dictionary.doc2bow(tok)]))
+            results.append(rlt)
         return results
+
+    def _vector(self, doc):
+        return [vec for i, vec in doc]
 
     def build(self, load=False):
         if load is True and os.path.exists(LSI.model_path) and os.path.exists(LSI.index_path):
