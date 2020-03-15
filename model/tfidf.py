@@ -33,7 +33,8 @@ class TF_IDF(SimBaseModel):
         sorted_sims = SortedDict.to_list(dict(enumerate(sims)))
         for ix, prob in sorted_sims[0:topn]:
             # ix: document_number
-            results.append((self.dataframe.iloc[ix][field], prob))
+            row = self.dataframe.iloc[ix]
+            results.append(self._json_rlt(row[field], prob, tokens=row["tokens"]))
         return results
 
     def build(self, load=False):

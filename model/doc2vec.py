@@ -31,7 +31,8 @@ class Doc2Vector(SimBaseModel):
         sorted_sims = self.model.docvecs.most_similar([inferred_vector], topn=topn)
         for ix, prob in sorted_sims:
             # ix: document_number
-            results.append((self.dataframe.iloc[ix][field], prob))
+            row = self.dataframe.iloc[ix]
+            results.append(self._json_rlt(row[field], prob, tokens=row["tokens"]))
         return results
 
     def build(self, load=False):

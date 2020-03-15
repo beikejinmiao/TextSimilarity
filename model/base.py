@@ -26,6 +26,13 @@ class SimBaseModel(object):
             tokens = self.tokenize(text)
         return tokens
 
+    @staticmethod
+    def _json_rlt(text, similarity, tokens=None):
+        rlt = {"text": text, "similarity": str(round(similarity, 4))}
+        if tokens:
+            rlt["tokens"] = tokens if isinstance(tokens, str) else " ".join(tokens)
+        return rlt
+
     @costime("sim", msg="query nearest")
     def nearest(self, text, topn=5, field="question"):
         if not self._ready_df_model():

@@ -27,7 +27,11 @@ $ python iqa.py --mode=test
 def main():
     iqa = IQAMain()
     mode = iqa.args.mode
-    runtime = getattr(IQAMode(mode), mode)
+    if mode == "server":
+        from server.webserver import app
+        runtime = app.run
+    else:
+        runtime = getattr(IQAMode(mode), mode)
     runtime()
     return 0
 

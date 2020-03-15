@@ -44,7 +44,7 @@ class IQAMode(object):
         logger.debug("build dictionary and corpus. dictionary size: %d" % (len(dictionary.token2id)))
 
         # build models
-        self.models = build_models(dictionary, corpus, df)
+        self.models = build_models(df, dictionary, corpus)
         if self.mode == "train":
             self.check_model(*all_models)
         # dump df/dictionary/corpus/models
@@ -57,23 +57,11 @@ class IQAMode(object):
         if not os.path.exists(MODEL_HOME) or len(os.listdir(MODEL_HOME)) <= 0:
             df, dictionary, corpus = self.train()
         else:
-            # load dataframe from csv
-            logger.debug("load dataframe: '%s'" % df_tokens_path)
-            df = pd.read_csv(df_tokens_path, index_col=0)
-            df["tokens"] = df["tokens"].map(lambda x: str(x).split())
-            # load dictionary/corpus
-            logger.debug("load dictionary: '%s'" % dictionary_path)
-            with open(dictionary_path, "rb") as fopen:
-                dictionary = pickle.load(fopen)
-            logger.debug("load corpus: '%s'" % corpus_path)
-            corpus = gensim.corpora.MmCorpus(corpus_path)
-        # build model if it not existed
+            df, dictionary, corpus = load_corpus()
+            # build model if it not existed
         if len(self.models) == 0:
-            self.models = build_models(dictionary, corpus, df, model="all", load=True)
+            self.models = build_models(df, dictionary, corpus, model="all", load=True)
         self.check_model(*all_models)
-
-    def server(self):
-        pass
 
     def check_model(self, *args):
         question = "KTV开发票明细能不能开服务费？"
@@ -86,9 +74,10 @@ class IQAMode(object):
             logger.debug(model.nearest(que_tokens) if model is not None else "None")
 
 
-def _check_model_name(*args):
+def _check_model_name(mod_names):
     _model = set()
-    for name in args:
+    mod_names = [mod_names, ] if isinstance(mod_names, str) else list(mod_names)
+    for name in mod_names:
         if name == "all":
             return all_models
         if name not in all_models:
@@ -98,17 +87,31 @@ def _check_model_name(*args):
     return list(_model)
 
 
-def build_models(dictionary, corpus, dataframe, model="all", load=False):
+def load_corpus():
+    # load dataframe from csv
+    logger.debug("load dataframe: '%s'" % df_tokens_path)
+    df = pd.read_csv(df_tokens_path, index_col=0)
+    df["tokens"] = df["tokens"].map(lambda x: str(x).split())
+    # load dictionary/corpus
+    logger.debug("load dictionary: '%s'" % dictionary_path)
+    with open(dictionary_path, "rb") as fopen:
+        dictionary = pickle.load(fopen)
+    logger.debug("load corpus: '%s'" % corpus_path)
+    corpus = gensim.corpora.MmCorpus(corpus_path)
+    return df, dictionary, corpus
+
+
+def build_models(dataframe, dictionary, corpus, model="all", load=False):
     models = dict()
     model_names = _check_model_name(model)
     for name in model_names:
         if name == "tfidf":
             models[name] = TF_IDF(dictionary, corpus, dataframe=dataframe, load=load)
-        if name == "lsi":
+        elif name == "lsi":
             models[name] = LSI(dictionary, corpus, dataframe=dataframe, load=load)
-        if name == "word2vec":
+        elif name == "word2vec":
             models[name] = Word2Vector(dataframe=dataframe, load=load)
-        if name == "doc2vec":
+        elif name == "doc2vec":
             models[name] = Doc2Vector(dataframe=dataframe, load=load)
     return models
 
@@ -128,5 +131,4 @@ def dump(dictionary=None, corpus=None, dataframe=None, models=None):
     if models is not None:
         for name in models:
             models[name].dump()
-
 

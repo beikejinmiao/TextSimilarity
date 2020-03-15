@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IQA</title>
+    <script>
+        var xhr = new XMLHttpRequest();
+        const url = "http://127.0.0.1:5000/api/iqa/v1/query";
+        xhr.onreadystatechange = function () {
+            if(xhr.readyState === 4 && xhr.status === 200) {
+                // var resp = JSON.parse(this.responseText);
+                // document.getElementById("result").value = JSON.stringify(resp);
+                document.getElementById("result").value = this.responseText;
+            }
+            // end of state change: it can be after some time (async)
+        };
+
+        function commit()
+        {
+            document.getElementById("btn_commit").onclick = function () {
+                var models = [];
+                var items = document.getElementsByName("model");
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].checked) {
+                        models.push(items[i].value);
+                    }
+                }
+                var question = document.getElementById("question").value;
+                // post question
+                xhr.open("POST", url, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(JSON.stringify({
+                    model: models,
+                    question: question
+                }));
+            };
+        }
+    </script>
+</head>
+<body>
+    <p>请选择Embedding Model</p>
+    <p><label>
+        <input type="checkbox" name="model" value="tfidf" />
+    </label>TF-IDF </p>
+    <p><label>
+        <input type="checkbox" name="model" value="lsi" />
+    </label>LSI</p>
+    <p><label>
+        <input type="checkbox" name="model" value="word2vec" />
+    </label>Word2Vec</p>
+    <p><label>
+        <input type="checkbox" name="model" value="doc2vec" />
+    </label>Doc2Vec</p>
+
+    <div style="display: inline-block; vertical-align: top">
+        <textarea rows="40" cols="50" placeholder="请输出想要查询的问题" id="question"></textarea>
+    </div>
+    <p style="display: inline-block; vertical-align: top">
+        <input id="btn_commit" type="button" value="提交" onclick="commit()" />
+    </p>
+    <div style="display: inline-block; vertical-align: top">
+        <textarea disabled rows="40" cols="110" placeholder="查询结果" id="result" ></textarea>
+    </div>
+
+
+
+
+
+</body>
+</html>

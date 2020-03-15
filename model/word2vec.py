@@ -53,7 +53,8 @@ class Word2Vector(SimBaseModel):
         for i, dist in enumerate(dists[0]):
             # ix: document_number
             ix = indices[0][i]
-            results.append((self.dataframe.iloc[ix][field], 1-dist/dist_sum))
+            row = self.dataframe.iloc[ix]
+            results.append(self._json_rlt(row[field], 1-dist/dist_sum, tokens=row["tokens"]))
         return results
 
     def build(self, load=False):
