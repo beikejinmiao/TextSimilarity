@@ -5,7 +5,7 @@
     <title>IQA</title>
     <script>
         var xhr = new XMLHttpRequest();
-        const url = "http://127.0.0.1:5000/api/iqa/v1/query";
+        const url = "http://127.0.0.1:5000/api/iqa/sim/query";
         xhr.onreadystatechange = function () {
             if(xhr.readyState === 4 && xhr.status === 200) {
                 // var resp = JSON.parse(this.responseText);
@@ -61,9 +61,6 @@
     <div style="display: inline-block; vertical-align: top">
         <textarea disabled rows="40" cols="110" placeholder="查询结果" id="result" ></textarea>
     </div>
-
-
-
 
 
 </body>
