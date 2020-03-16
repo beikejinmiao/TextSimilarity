@@ -12,7 +12,7 @@ app = Flask(__name__)
 models = build_models(*load_corpus(), load=True)
 
 
-def _query_handle(question, modelist, topn=5):
+def _query_handle(question, modelist, topn=5, score=False):
     resp_json = dict()
     if question and len(modelist) > 0:
         print(question)
@@ -20,7 +20,7 @@ def _query_handle(question, modelist, topn=5):
         que_tokens = tokenizer.cut(question)
         for name in modelist:
             _startime = time.time()
-            results = models[name].nearest(que_tokens, topn=topn, score=True)
+            results = models[name].nearest(que_tokens, topn=topn, score=score)
             costime = (time.time() - _startime) * 1000
             resp_json[name] = {"top_sim": results, "cost_time": "%.2fms" % costime}
     return json.dumps(resp_json, ensure_ascii=False, indent=4)
@@ -54,13 +54,15 @@ def near_get_query():
     try:
         topn = int(request.args.get("topn", 0))
         topn = topn if topn > 0 else 5
+        score = request.args.get("score", "false").lower()
+        score = True if score == "true" else False
         return _query_handle(request.args.get("question"),
                              _check_model_name(request.args.get("model").split(",")),
-                             topn=topn)
+                             topn=topn, score=score)
     except:
         return "There are maybe some errors occurred in execution. Please check your parameters that committed."
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=8080, debug=True)
 

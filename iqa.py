@@ -29,10 +29,10 @@ def main():
     mode = iqa.args.mode
     if mode == "server":
         from server.webserver import app
-        runtime = app.run
+        app.run(host="0.0.0.0", port=8080)
     else:
         runtime = getattr(IQAMode(mode), mode)
-    runtime()
+        runtime()
     return 0
 
 
