@@ -44,7 +44,7 @@ class IQAMode(object):
         logger.debug("build dictionary and corpus. dictionary size: %d" % (len(dictionary.token2id)))
 
         # build models
-        self.models = build_models(df, dictionary, corpus)
+        self.models = build_models(df, dictionary, corpus, model="all")
         if self.mode == "train":
             self.check_model(*all_models)
         # dump df/dictionary/corpus/models
@@ -130,5 +130,6 @@ def dump(dictionary=None, corpus=None, dataframe=None, models=None):
         dataframe.to_csv(df_tokens_path)
     if models is not None:
         for name in models:
-            models[name].dump()
+            if models.get(name) is not None:
+                models[name].dump()
 
