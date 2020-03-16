@@ -1,5 +1,12 @@
 ## Usage
+ - test   
 `python iqa.py --mode=test`
+ - 启动Web服务     
+`python iqa.py --mode=server`           
+然后访问http://127.0.0.1:8080/查看使用说明    
+
+【注意】使用之前需要下载[model.zip](https://pan.baidu.com/s/1SPlhgofybq7tgjy2SeisEg)，解压后将内容拷贝至IQA/resources目录下。   
+&emsp;&emsp;&emsp;&emsp;提取码：yeec  
 
 ## 项目结构介绍
 
@@ -37,9 +44,9 @@
 
 ### server
  - socket.py
-实现系统socket接口
+系统socket接口(未实现)
  - webserver.py
-实现系统Web API
+系统Web API
 
 ### iqa.py
 系统主文件，用于解析参数、启动系统
