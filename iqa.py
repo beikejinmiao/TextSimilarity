@@ -3,6 +3,7 @@
 import sys
 import argparse
 from mode import IQAMode
+from conf.config import web_host, web_port
 
 
 class IQAMain(object):
@@ -18,7 +19,7 @@ $ python iqa.py --mode=test
         parser = argparse.ArgumentParser(epilog=self._usage_example)
         # run mode
         parser.add_argument("-m", "--mode",
-                            choices=["train", "test", "server"], default="test", help="Run mode")
+                            choices=["train", "test", "server"], default="server", help="Run mode")
 
         args = parser.parse_args()
         return args
@@ -29,7 +30,7 @@ def main():
     mode = iqa.args.mode
     if mode == "server":
         from server.webserver import app
-        app.run(host="0.0.0.0", port=8080)
+        app.run(host=web_host, port=web_port)
     else:
         runtime = getattr(IQAMode(mode), mode)
         runtime()

@@ -7,6 +7,7 @@ from flask import request
 # from flask import jsonify
 from libs.segment import tokenizer
 from mode import load_corpus, build_models, _check_model_name
+from conf.config import web_host, web_port
 
 app = Flask(__name__)
 models = build_models(*load_corpus(), load=True)
@@ -64,5 +65,5 @@ def near_get_query():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    app.run(host=web_host, port=web_port, debug=True)
 

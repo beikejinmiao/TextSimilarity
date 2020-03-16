@@ -16,8 +16,7 @@ from libs.wrapper import costime
 from libs.logger import get_logger
 
 logger = get_logger(_file_=__file__)
-original_csv = os.path.join(RESOURCE_HOME, "question_1k.csv")    # accountant_qa_dataset.csv
-# original_csv = "E:\\AILearn\\julyedu\\10th.TrainingCamp\\NLP\\ChatBot\\accountant_qa_dataset.csv"
+original_csv = os.path.join(RESOURCE_HOME, "accountant_qa_dataset.csv")    #
 
 
 class IQAMode(object):
@@ -31,8 +30,8 @@ class IQAMode(object):
         if not os.path.exists(MODEL_HOME):
             os.makedirs(MODEL_HOME)
         # load original data
-        # df = pd.read_csv(original_csv, header=None, names=["id", "question", "answer"])
-        df = pd.read_csv(original_csv)
+        df = pd.read_csv(original_csv, header=None, names=["id", "question", "answer"])
+        # df = pd.read_csv(original_csv)
         logger.debug("load dataframe: '%s', size: %d" % (original_csv, df.shape[0]))
         df = df[["id", "question"]].drop_duplicates().reset_index(drop=True)
         logger.debug("after drop duplicates, size: %d" % df.shape[0])
