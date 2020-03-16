@@ -5,8 +5,10 @@
 `python iqa.py --mode=server`             
 然后访问 http://127.0.0.1:8080/  查看使用说明    
 
-【注意】使用之前需要下载[model.zip](https://pan.baidu.com/s/1SPlhgofybq7tgjy2SeisEg)，解压后将内容拷贝至IQA/resources目录下。   
-&emsp;&emsp;&emsp;&emsp;提取码：yeec  
+【注意】
+ - 运行test/server模式之前需要下载[model.zip](https://pan.baidu.com/s/1SPlhgofybq7tgjy2SeisEg)(提取码:yeec)，解压后将内容拷贝至`resources`目录下。   
+ - 也可以将`accountant_qa_dataset.csv`(model.zip中已包含该文件)拷贝至`resources`目录下，执行`python iqa.py --mode=train`重新训练所有模型。
+ 
 
 ## 项目结构介绍
 
