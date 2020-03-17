@@ -30,13 +30,16 @@ class IQAMode(object):
         if not os.path.exists(MODEL_HOME):
             os.makedirs(MODEL_HOME)
         # load original data
-        df = pd.read_csv(original_csv, header=None, names=["id", "question", "answer"])
-        # df = pd.read_csv(original_csv)
-        logger.debug("load dataframe: '%s', size: %d" % (original_csv, df.shape[0]))
-        df = df[["id", "question"]].drop_duplicates().reset_index(drop=True)
-        logger.debug("after drop duplicates, size: %d" % df.shape[0])
-        df["tokens"] = df["question"].map(lambda x: tokenizer.cut(x, pregex=True))
-
+        if os.path.exists(original_csv):
+            df = pd.read_csv(original_csv, header=None, names=["id", "question", "answer"])
+            logger.debug("load dataframe: '%s', size: %d" % (original_csv, df.shape[0]))
+            df = df[["id", "question"]].drop_duplicates().reset_index(drop=True)
+            logger.debug("after drop duplicates, size: %d" % df.shape[0])
+            df["tokens"] = df["question"].map(lambda x: tokenizer.cut(x, pregex=True))
+        else:
+            logger.debug("load dataframe: '%s'" % df_tokens_path)
+            df = pd.read_csv(df_tokens_path, index_col=0)
+            df["tokens"] = df["tokens"].map(lambda x: str(x).split())
         # build dictionary/corpus
         dictionary = gensim.corpora.Dictionary(df["tokens"])
         corpus = [dictionary.doc2bow(tokens) for tokens in df["tokens"]]
