@@ -5,7 +5,7 @@
     <title>IQA</title>
     <script>
         var xhr = new XMLHttpRequest();
-        const url = "http://127.0.0.1:5000/api/iqa/sim/query";
+        const url = "/api/iqa/sim/query";
         xhr.onreadystatechange = function () {
             if(xhr.readyState === 4 && xhr.status === 200) {
                 // var resp = JSON.parse(this.responseText);

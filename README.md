@@ -19,14 +19,14 @@
 核心库         
  - logger.py         
 实现打印日志功能         
- - resource.py         
+ - resource.py
 实现读取系统资源功能，主要读取字典和停顿词
  - score.py         
 实现bleu和cosine计算
  - segment.py         
 实现数据清洗和分词功能
  - singleton.py         
-单例类，主要保证系统资源单例
+单例父类，主要保证系统资源单例
  - util.py         
 实现基础工具函数，比如排序、读取文件
  - wrapper.py         
@@ -37,6 +37,7 @@
  - tfidf
  - lsi
  - word2vec
+   - 文本向量为把所有词向量加和后取平均值，然后使用KDTree查找最相似文本
  - doc2vec
 
 后续可以持续补充。
