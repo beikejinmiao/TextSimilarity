@@ -9,7 +9,7 @@
 启动命令：`python iqa.py --mode=test`，用于验证已训练好的模型。  
  - Web服务模式     
 启动命令：`python iqa.py --mode=server`，然后访问 http://127.0.0.1:8080/  查看使用说明。       
-目前已部署至线上服务器http://47.104.224.226:8080/，可以直接使用。    
+目前已部署至线上服务器http://47.104.224.226:8080/   ，可以直接使用。    
 
 **[注]**    
  - 重新训练模型比较耗时，建议直接使用训练好的[model.zip](https://pan.baidu.com/s/1XMW0ZoH_lFOMMxfF-GFzIg)(提取码:8n3y)，直接启动Web服务。
@@ -48,14 +48,14 @@
  - base.py         
 embedding模型基类，定义常用函数
      - tfidf.py      
-    基于TF-IDF计算、查询文本相似性
+    基于[TF-IDF](https://radimrehurek.com/gensim/models/tfidfmodel.html)计算、查询文本相似性
      - lsi.py   
-    基于LSA/LSI计算、查询文本相似性
+    基于[LSA/LSI](https://radimrehurek.com/gensim/auto_examples/core/run_topics_and_transformations.html)计算、查询文本相似性
      - word2vec.py      
-    基于Word2Vec计算、查询文本相似性；      
-    文本向量为把所有词向量加和后取平均值，然后使用KDTree查找最相似文本
+    基于[Word2Vec](https://radimrehurek.com/gensim/auto_examples/tutorials/run_word2vec.html)计算、查询文本相似性；      
+    文本向量为**所有词word2vec向量加和后取平均值，使用KDTree查找最相似文本**
      - doc2vec.py     
-    基于Doc2Vec计算、查询文本相似性
+    基于[Doc2Vec](https://radimrehurek.com/gensim/auto_examples/tutorials/run_doc2vec_lee.html)计算、查询文本相似性
       
 后续需持续补充。
 
