@@ -2,7 +2,7 @@ jieba==0.42.1
 scikit-learn==0.22.1
 gensim==3.8.1
 nltk==3.4.5
-numpy==1.18.1
+numpy==1.22.0
 scipy==1.4.1
 pandas==1.0.1
 #tensorflow==1.14.0
