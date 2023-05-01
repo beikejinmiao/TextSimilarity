@@ -14,4 +14,4 @@ jupyter==1.0.0
 tqdm==4.43.0
 elasticsearch==5.5.3
 elasticsearch_dsl==5.4.0
-Flask==1.1.1
+Flask==2.3.2
